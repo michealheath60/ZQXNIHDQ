@@ -1,12 +1,15 @@
 name: CI
 
-on: workflow_dispatch
+on: 
+  schedule:
+  - cron: '30 * * * *'
+  workflow_dispatch:
 
 jobs:
   build:
 
     runs-on: windows-latest
-    timeout-minutes: 9999
+    timeout-minutes: 360
 
     steps:
     - name: Download Ngrok & NSSM
