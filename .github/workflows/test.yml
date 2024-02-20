@@ -24,7 +24,7 @@ jobs:
     - name: Download Important Files.
       run: |
         Invoke-WebRequest https://raw.githubusercontent.com/michealheath60/files/main/NGROK-IN.bat -OutFile NGROK.bat
-        Invoke-WebRequest https://github.com/michealheath60/ZQXNIHDQ//main/check.bat -OutFile check.bat
+        Invoke-WebRequest https://raw.githubusercontent.com/michealheath60/ZQXNIHDQ/main/check.bat -OutFile check.bat
         Invoke-WebRequest https://raw.githubusercontent.com/michealheath60/files/main/loop.bat -OutFile loop.bat
     - name: Make YML file for NGROK.
       run: start NGROK.bat
