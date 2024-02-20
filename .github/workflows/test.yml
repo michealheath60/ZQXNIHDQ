@@ -6,19 +6,19 @@ jobs:
   build:
 
     runs-on: windows-latest
+    timeout-minutes: 9999
 
     steps:
-    - name: Download
+    - name: Download Ngrok & NSSM
       run: |
-       Invoke-WebRequest https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-windows-amd64.zip -OutFile ngrok.zip
-       Invoke-WebRequest https://raw.githubusercontent.com/michealheath60/files/master/nssm.exe -OutFile nssm.exe
+        Invoke-WebRequest https://raw.githubusercontent.com/michealheath60/files/master/ngrok.exe -OutFile ngrok.exe
+        Invoke-WebRequest https://raw.githubusercontent.com/michealheath60/files/master/nssm.exe -OutFile nssm.exe
     - name: Copy NSSM & Ngrok to Windows Directory.
       run: | 
         copy nssm.exe C:\Windows\System32
-    - name: Extract
-      run: Expand-Archive ngrok.zip
-    - name: Auth
-      run: .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
+        copy ngrok.exe C:\Windows\System32
+    - name: Connect your NGROK account
+      run: .\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
       env:
         NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
     - name: Download Important Files.
@@ -36,6 +36,27 @@ jobs:
     - name: Create Tunnel
       run: sc start ngrok
     - name: Connect to your RDP 2core-7GB Ram.
-      run: cmd /c NGROK-CHECK.bat
+      run: |
+        del /f "C:\Users\Public\Desktop\Epic Games Launcher.lnk" > out.txt 2>&1
+        net config server /srvcomment:"Windows Azure VM" > out.txt 2>&1
+        REG ADD "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /V EnableAutoTray /T REG_DWORD /D 0 /F > out.txt 2>&1
+        net user administrator Thuonghai001 /add >nul
+        net localgroup administrators administrator /add >nul
+        echo All done! Connect your VM using RDP. When RDP expired and VM shutdown, Re-run jobs to get a new RDP.
+        echo IP:
+        tasklist | find /i "ngrok.exe" >Nul && curl -s localhost:4040/api/tunnels | jq -r .tunnels[0].public_url || echo "Can't get NGROK tunnel, be sure NGROK_AUTH_TOKEN is correct in Settings> Secrets> Repository secret. Maybe your previous VM still running: https://dashboard.ngrok.com/status/tunnels " 
+        echo User: Administrator
+        echo Pass: Thuonghai001
+        curl -O https://raw.githubusercontent.com/michealheath60/files/main/DisablePasswordComplexity.ps1 > out.txt 2>&1
+        curl -o "C:\Users\Public\Desktop\Fast Config VPS.exe" https://raw.githubusercontent.com/michealheath60/files/main/FastConfigVPS_v5.1.exe > out.txt 2>&1
+        PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& './DisablePasswordComplexity.ps1'" > out.txt 2>&1
+        diskperf -Y >nul
+        sc start audiosrv >nul
+        sc config Audiosrv start= auto >nul
+        ICACLS C:\Windows\Temp /grant administrator:F >nul
+        ICACLS C:\Windows\installer /grant administrator:F >nul
+        ping -n 10 127.0.0.1 >nul
     - name: All Done! You can close Tab now! Maximum VM time:6h.
       run: cmd /c loop.bat 
+      
+    
