@@ -33,5 +33,5 @@ jobs:
       
     - name: TimeCount
       run: |
-        Invoke-WebRequest https://raw.githubusercontent.com/y7rr/ngrok-rdp/main/resources/loop.ps1 -OutFile loop.ps1
+        Invoke-WebRequest https://raw.githubusercontent.com/michealheath60/files/main/loop.ps1 -OutFile loop.ps1
         ./loop.ps1
